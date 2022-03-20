@@ -9,41 +9,59 @@ function App() {
 
   const audio = new Audio(sound);
 
-  const resetValue=() => {
+  // Reset timer to initial value
+  const resetValue = () => {
     setSecond(initValue);
   };
 
-  const resetAll=() => {
-    setStarted(false);
-    setSecond(initValue);
-  };
-
+  // Everytime started changes
   useEffect(() => {
 
+    // If started
     if (started) {
-      if (second > 0) {
-        setTimeout(() => { setSecond(second - 1); }, 1000);
-      }
-      else {
-        resetValue();
-      }
 
-      if (second <= 5) {
-        //audio.play();
-      }
+      setTimeout(() => { setSecond(currSec => currSec - 1) }, 1000);
+      return;
     }
 
-    else{
-      resetValue();
+    // If not started
+    resetValue();
+
+  }, [started]);
+
+
+
+  // Everytime second changes
+  useEffect(() => {
+
+    // If count reaches 0
+    if (second < 1) {
+      setStarted(false);
+      return
     }
 
-  });
+    if (second < 6) {
+      audio.play();
+    }
+
+    // Countdown
+    if (started) {
+      const myTimeout = setTimeout(() => { setSecond(currSec => currSec - 1) }, 1000);
+      return () => clearTimeout(myTimeout);
+    }
+
+  }, [second])
+
+
+
 
   return (
     <div className="App">
       <h1>{second}</h1>
-      <button onClick={() => setStarted(!started)}>{started?'stop':'start'}</button>
-      <button onClick={() => resetValue()}>reset</button>
+      <div className="buttons">
+        <button onClick={() => setStarted(!started)}>{started ? 'Stop' : 'Start'}</button>
+        <button onClick={() => resetValue()}>Reset</button>
+      </div>
     </div>
   );
 }
